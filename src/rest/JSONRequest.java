@@ -3,6 +3,11 @@ package rest;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
+
 public class JSONRequest{
     private String type;
     private String username;
@@ -21,7 +26,7 @@ public class JSONRequest{
         if(!type.equals("")) this.type = type;
         if(!username.equals("")) this.username = username;
         if(!name.equals("")) this.name = name;
-        if(!password.equals("")) this.password = password;
+        if(!password.equals("")) this.password = hashPassword(password);
         if(!groupname.equals("")) this.groupname = groupname;
         if(!idUser.equals("")) this.idUser =  Integer.parseInt(idUser);
         if(!idGroup.equals("")) this.idGroup = Integer.parseInt(idGroup);
@@ -142,24 +147,23 @@ public class JSONRequest{
     public boolean parseCreateGroup() throws JSONException{
         JSONObject children = (JSONObject) jsonObject.get("createGroup");
         groupname = children.getString("name");
-        if(name.equals("")){
+        if(groupname.equals("")){
             return false;
         }
-
         return true;
     }
 
     public boolean parseJoinGroup() throws JSONException{
         JSONObject children = (JSONObject) jsonObject.get("joinGroup");
-        idGroup = Integer.parseInt(children.getString("idGroup"));
-        idUser = Integer.parseInt(children.getString("idUser"));
+        idGroup = children.getInt("idGroup");
+        idUser = children.getInt("idUser");
         return true;
     }
 
     public boolean parseSendMessage() throws JSONException{
         JSONObject children = (JSONObject) jsonObject.get("sendMessage");
-        idGroup = Integer.parseInt(children.getString("idGroup"));
-        idUser = Integer.parseInt(children.getString("idUser"));
+        idGroup = children.getInt("idGroup");
+        idUser = children.getInt("idUser");
         message_text = children.getString("text");
         if(message_text.equals("")){
             return false;
@@ -170,7 +174,7 @@ public class JSONRequest{
 
     public boolean parseAddToDo() throws JSONException{
         JSONObject children = (JSONObject) jsonObject.get("addToDo");
-        idGroup = Integer.parseInt(children.getString("idGroup"));
+        idGroup = children.getInt("idGroup");
         todo_text = children.getString("text");
         if(todo_text.equals("")){
             return false;
@@ -181,9 +185,21 @@ public class JSONRequest{
 
     public boolean parseCheckToDo() throws JSONException{
         JSONObject children = (JSONObject) jsonObject.get("checkToDo");
-        idGroup = Integer.parseInt(children.getString("idGroup"));
-        idTodo = Integer.parseInt(children.getString("idToDo"));
+        idTodo = children.getInt("idToDo");
         return true;
+    }
+
+    public String hashPassword(String password) {
+        MessageDigest digest = null;
+        try {
+            digest = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        byte[] hash = digest.digest(password.getBytes(StandardCharsets.UTF_8));
+        String encoded = Base64.getEncoder().encodeToString(hash);
+
+        return encoded;
     }
 
     public String getType() {

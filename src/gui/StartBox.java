@@ -5,13 +5,12 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-/**
- * Created by rita on 13-05-2017.
- */
 public class StartBox extends JFrame {
 
     private JButton loginButton;
     private JButton registerButton;
+    private HomeBox homeBox;
+    private boolean viewHomeBox = false;
 
 
     public StartBox() throws HeadlessException {
@@ -20,6 +19,7 @@ public class StartBox extends JFrame {
 
         setSize(300,150);
         setResizable(true);
+        setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
         JPanel panel = new JPanel(new GridBagLayout());
@@ -34,12 +34,14 @@ public class StartBox extends JFrame {
         cs.gridwidth = 1;
         panel.add(registerButton,cs);
 
+        StartBox startBox = this;
+
         registerButton.addActionListener(
                 new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
                         dispose();
-                        RegisterBox r = new RegisterBox();
+                        RegisterBox r = new RegisterBox(startBox);
                         r.setVisible(true);
                     }
                 }
@@ -51,12 +53,13 @@ public class StartBox extends JFrame {
         cs.gridwidth = 1;
         panel.add(loginButton,cs);
 
+
         loginButton.addActionListener(
                 new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
                         dispose();
-                        LoginBox l = new LoginBox();
+                        LoginBox l = new LoginBox(startBox);
                         l.setVisible(true);
                     }
                 }
@@ -66,6 +69,27 @@ public class StartBox extends JFrame {
 
         setVisible(true);
 
+    }
+
+    public boolean isViewHomeBox() {
+        return viewHomeBox;
+    }
+
+    public void setHomeBox(HomeBox homeBox){
+        this.homeBox = homeBox;
+        this.viewHomeBox = true;
+    }
+
+    public void updateHomeBoxParticipants(){
+        this.homeBox.updateParticipants();
+    }
+
+    public void updateHomeBoxMessages(){
+        this.homeBox.updateMessages();
+    }
+
+    public void updateHomeBoxTasks(){
+        this.homeBox.updateTaskPanel();
     }
 
     public static void main(String[] args){
